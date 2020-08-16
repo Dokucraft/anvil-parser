@@ -34,15 +34,18 @@ class Chunk:
         Version of the chunk NBT structure
     data: :class:`nbt.TAG_Compound`
         Raw NBT data of the chunk
+    tile_entities: List[:class:`nbt.TAG_Compound`]
+        List of tile entities in the chunk
     """
-    __slots__ = ('version', 'data', 'x', 'z')
+    __slots__ = ('version', 'data', 'x', 'z', 'tile_entities')
 
     def __init__(self, nbt_data: nbt.NBTFile):
         self.version = nbt_data['DataVersion'].value
         self.data = nbt_data['Level']
         self.x = self.data['xPos'].value
         self.z = self.data['zPos'].value
-        
+        self.tile_entities = self.data['TileEntities'].tags
+
     def get_section(self, y: int) -> nbt.TAG_Compound:
         """
         Returns the section at given y index

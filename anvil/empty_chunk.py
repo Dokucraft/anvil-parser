@@ -18,13 +18,16 @@ class EmptyChunk:
         List of all the sections in this chunk
     version: :class:`int`
         Chunk's DataVersion
+    tile_entities: List[:class:`nbt.TAG_Compound`]
+        List of tile entities in the chunk
     """
-    __slots__ = ('x', 'z', 'sections', 'version')
+    __slots__ = ('x', 'z', 'sections', 'version', 'tile_entities')
     def __init__(self, x: int, z: int):
         self.x = x
         self.z = z
         self.sections: List[EmptySection] = [None]*16
         self.version = 1976
+        self.tile_entities = []
 
     def add_section(self, section: EmptySection, replace: bool = True):
         """
@@ -115,7 +118,6 @@ class EmptyChunk:
         level.name = 'Level'
         level.tags.extend([
             nbt.TAG_List(name='Entities', type=nbt.TAG_Compound),
-            nbt.TAG_List(name='TileEntities', type=nbt.TAG_Compound),
             nbt.TAG_List(name='LiquidTicks', type=nbt.TAG_Compound),
             nbt.TAG_Int(name='xPos', value=self.x),
             nbt.TAG_Int(name='zPos', value=self.z),
@@ -124,6 +126,9 @@ class EmptyChunk:
             nbt.TAG_Byte(name='isLightOn', value=1),
             nbt.TAG_String(name='Status', value='full')
         ])
+        tile_entities = nbt.TAG_List(name='TileEntities', type=nbt.TAG_Compound)
+        tile_entities.tags.extend(self.tile_entities)
+        level.tags.append(tile_entities)
         sections = nbt.TAG_List(name='Sections', type=nbt.TAG_Compound)
         for s in self.sections:
             if s:
